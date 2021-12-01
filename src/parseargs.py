@@ -76,10 +76,15 @@ class parseargs:
         if not self.exit_check_opt_arg_min(opt, args, self.__args[name]["min_args"]):
             return False
 
+        ret = ""
         if self.__args[name]["hasarg"]:
-            self.__args[name]["callback"](*args)
+            ret = self.__args[name]["callback"](*args)
         else:
-            self.__args[name]["callback"]()
+            ret = self.__args[name]["callback"]()
+
+        if self.__args[name]["output"]:
+            self.__args[name]["output"](ret)
+
         return True
 
     def make_short_arg(self, arg):
@@ -101,7 +106,21 @@ class parseargs:
             short_name = self.get_name(short_arg)
         return short_arg
 
-    def append(self, name, desc, hasarg = False, arglist = None, optional_arglist = None, priority = 100, argtype = argtype.LIST, callback = None):
+    def append(self, 
+            name, 
+            desc, 
+            hasarg = False, 
+            arglist = None, 
+            optional_arglist = None, 
+            priority = 100, 
+            argtype = argtype.LIST, 
+            callback = None,
+            output = None):
+        '''
+           @dev append can use function
+
+           @param output output result data 
+        '''
 
         arg_name = name
         if self.is_func_or_method(name):
@@ -111,6 +130,7 @@ class parseargs:
 
         if arg_name in self.__args:
             raise Exception(f"arg({arg_name}) is exists.")
+
 
         min_args = len(arglist) if arglist else 0
 
@@ -124,6 +144,10 @@ class parseargs:
         if callback and arglist is None and optional_arglist is None:
             arg_defaults = callback.__defaults__
             arglist_all = list(callback.__code__.co_varnames[:callback.__code__.co_argcount])
+
+            if arglist_all and len(arglist_all) > 0 and "self" == arglist_all[0]:
+                del arglist_all[0]
+
             min_args = len(arglist_all) - len(arg_defaults) if arg_defaults else len(arglist_all)
             hasarg = len(arglist_all) > 0
             if arg_defaults:
@@ -158,7 +182,8 @@ class parseargs:
                 "argtype": argtype, \
                 "callback": callback, \
                 "hasarg": hasarg, \
-                "min_args": min_args}
+                "min_args": min_args, \
+                "output": output}
 
     def remove(self, name):
         self.__args.pop(name)
