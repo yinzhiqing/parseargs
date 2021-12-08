@@ -106,6 +106,24 @@ class parseargs:
             short_name = self.get_name(short_arg)
         return short_arg
 
+    def __get_name(self, name):
+        if self.is_func_or_method(name):
+            return name.__name__
+        return str(name)
+
+    def appends(self, val, no_includes = [], no_starts = ["_"]):
+        no_includes.extend(["init_args", "run", "main"])
+        no_includes = [self.__get_name(name)for name in no_includes]
+        for k, v in val.items():
+            next_app = False if k in no_includes else True
+            for ns in no_starts:
+                if k.startswith(ns):
+                    next_app = False
+                    continue
+
+            if next_app and not self.is_exists(k) and self.is_func_or_method(v):
+                self.append(v, " ".join(k.split("_")))
+
     def append(self, 
             name, 
             desc, 
@@ -331,6 +349,15 @@ class parseargs:
 
     def is_func_or_method(self, func):
         return isinstance(func, types.MethodType) or isinstance(func, types.FunctionType)
+
+    def is_exists(self, name):
+        arg_name = name
+        if self.is_func_or_method(name):
+            arg_name = name.__name__
+            if not callback:
+                callback = name
+
+        return arg_name in self.__args
 
     def append_func(self, func):
         if not self.is_func_or_method(func): raise Exception(f"{func} is not FunctionType or MethodType")
