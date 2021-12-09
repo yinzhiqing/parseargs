@@ -112,6 +112,13 @@ class parseargs:
         return str(name)
 
     def appends(self, val, no_includes = [], no_starts = ["_"]):
+        '''
+           @dev append all funcs.
+           @param val globals()
+           @param no_includes no includes functions(name or function)
+           @param no_starts  filter startswith 
+
+        '''
         no_includes.extend(["init_args", "run", "main"])
         no_includes = [self.__get_name(name)for name in no_includes]
         for k, v in val.items():

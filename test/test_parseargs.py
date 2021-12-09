@@ -37,6 +37,11 @@ def init_args(pargs):
     pargs.append(no_use_func_args, "here args name is not funcs arg", True, "fixed_name, fixed_age, fixed_area")
     pargs.append("use_func_args", "here args name is funcs arg", True, "name, age, area", callback = no_use_func_args)
 
+    ## append all 
+    pargs.appends(globals(), 
+            no_includes = [run, 
+                init_args])
+
 def get_arg_info():
     argc = len(sys.argv) - 1
     argv = sys.argv[1:]
