@@ -39,6 +39,14 @@ class parseargs:
             return
         self.__unique.append(list(opts_unique))
 
+    @property
+    def argc(self):
+        return len(sys.argv) -1
+
+    @property
+    def argv(self):
+        return sys.argv[1:]
+
     def check_unique(self, opts):
         opt_list = [self.get_name(opt) for opt in opts]
         for uni in self.__unique:
@@ -441,6 +449,7 @@ class parseargs:
         help_info = help_info.replace(".", "\n\t")
         print(help_info)
     
+
     def test(self, argv, starts = "test"):
         self.__starts = starts
         if len(argv) == 1:
@@ -452,3 +461,5 @@ class parseargs:
             if ret :   print(ret);
         else: 
             self.show_args_list()
+
+
